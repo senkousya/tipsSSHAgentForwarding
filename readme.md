@@ -1,4 +1,4 @@
-# 💎SSH Agent Forwardingをつかってみる（Windows10）
+# 💎SSH Agent Forwardingをつかってみる（Windows 10）
 
 ローカルPCからsshで多段階接続する際に、それぞれのサーバに秘密鍵を置くのは面倒ですし、管理上もセキュリティ上でも嫌な事が多いかと思います。
 （ローカルPC -> HostA -> HostB という具合に多段接続するケース）
@@ -42,10 +42,9 @@ runningになっていればOK。
 
 ssh-add コマンドを利用して秘密鍵を登録します。
 
-ここで登録する秘密鍵としては、
 ローカルPC -> HostA -> HostB という具合に多段接続するケースを想定しており。
-HostBにssh接続する際に必要な秘密鍵となります。
-
+ここで登録する秘密鍵としては、
+HostBへssh接続する際に必要な秘密鍵となります。
 
 ```PowerShell
 # 秘密鍵の登録
@@ -84,13 +83,13 @@ Options:
 -A オプションを利用してssh接続することで、ForwardAgentが有効となります。
 このように接続する事で、ssh-agentに登録した鍵を接続のホストでも利用できるよううまいことやってくれる。
 
-```
+```shell
 ssh -A <<username>@<<host>> -i <<秘密鍵のパス>>
 ```
 
 なお`~/.ssh\config`に記載する場合は、
 
-下記のようにForwardAgent yesとして設定して上げれば-Aを指定する必要はなくなり常にForwardAgentが有効になります。
+下記のようにForwardAgent yesとして設定して上げればAオプションを指定する必要はなくなり常に対象ホストに接続する際はForwardAgentが有効になります。
 
 ```config
 Host 識別名
@@ -105,10 +104,16 @@ Host 識別名
 ssh-agentが登録された秘密鍵を接続先のHostでも利用できるようになっているため。
 下記のように実行すれば、登録された秘密鍵を利用してssh接続してくれます。
 
-```PowerShell
+```shell
 ssh <<username>>@<<host>>
+```
+
+今回のケースではHostBで多段接続が終わるのでAオプションはつけていませんが、さらにHostC -> HostD と多段が続く場合は下記のようにAオプションをつけて秘密鍵を連携して下さい。
+
+```PowerShell
+ssh -A <<username>>@<<host>>
 ```
 
 ## 総評
 
-bastionに接続してその先で作業等ある場合等でssh-agentのForwardAgent機能を利用すると便利かと思います。
+まずはbastionに接続し、目的地が更にその先にある場合はssh-agentのForwardAgent機能を利用すると便利かと思います。
